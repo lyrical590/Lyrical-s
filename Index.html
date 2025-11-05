@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LYRICAL - Stream and Download Movies</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #141414;
+            background-image: url('https://wallpapercave.com/wp/wp4056410.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        header {
+            background-color: rgba(20, 20, 20, 0.9);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e50914;
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            margin: 0;
+            color: #e50914;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        nav {
+            margin-top: 10px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: #e50914;
+        }
+        .search-container {
+            margin: 20px auto;
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: #333;
+            color: #fff;
+        }
+        button {
+            width: 30%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            background-color: #e50914;
+            color: white;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #f40612;
+        }
+        .suggestions, .results {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            justify-items: center;
+        }
+        @media (max-width: 1200px) {
+            .suggestions, .results {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (max-width: 900px) {
+            .suggestions, .results {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .suggestions, .results {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .movie-card {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 180px;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .movie-card h3 {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #fff;
+        }
+        .details {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(51, 51, 51, 0.9);
+            border-radius: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .details img {
+            width: 200px;
+            float: left;
+            margin-right: 20px;
+        }
+        .details h2 {
+            margin-top: 0;
+            color: #e50914;
+        }
+        .cast {
+            clear: both;
+            margin-top: 20px;
+        }
+        .cast img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 5px;
+        }
+        .downloads {
+            margin-top: 20px;
+        }
+        .downloads a {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px;
+            background-color: #e50914;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .downloads a:hover {
+            background-color: #f40612;
+        }
+        .trailer {
+            margin-top: 20px;
+        }
+        .trailer button {
+            padding: 10px;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .trailer button:hover {
+            background-color: #f40612;
+        }
+        .trailer iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+            margin-top: 10px;
+        }
+        video {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+        }
+        .load-more {
+            text-align: center;
+            margin: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .hidden {
+            display: none;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            color: #fff;
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LYRICAL</h1>
+        <p>Stream and Download Movies & TV Series</p>
+        <nav>
+            <a href="#" onclick="showPage('home')">Home</a>
+            <a href="#" onclick="showPage('animation')">Animation</a>
+            <a href="#" onclick="showPage('action')">Action</a>
+            <a href="#" onclick="showPage('horror')">Horror</a>
+            <a href="#" onclick="showPage('comedy')">Comedy</a>
+            <a href="#" onclick="showPage('drama')">Drama</a>
+            <a href="#" onclick="showPage('sci-fi')">Sci-Fi</a>
+            <a href="#" onclick="showPage('thriller')">Thriller</a>
+        </nav>
+    </header>
+    
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search for movies or TV series...">
+        <button onclick="searchMovies()">Search</button>
+    </div>
+    
+    <div id="page-title" class="page-title">Home - Trending Movies</div>
+    
+    <div id="suggestions" class="suggestions"></div>
+    <div id="results" class="results hidden"></div>
+    <div id="load-more" class="load-more hidden">
+        <button onclick="loadMore()">Load More</button>
+    </div>
+    
+    <div id="details" class="details hidden"></div>
+    
+    <script>
+        const baseUrl = 'https://movieapi.giftedtech.co.ke';
+        let currentPage = 1;
+        let currentQuery = '';
+        let hasMore = false;
+        let currentGenre = '';
+        
+        window.onload = function() {
+            showPage('home');
+        };
+        
+        function showPage(genre) {
+            currentGenre = genre;
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('load-more').classList.add('hidden');
+            document.getElementById('details').classList.add('hidden');
+            document.getElementById('suggestions').classList.remove('hidden');
+            document.getElementById('page-title').textContent = genre.charAt(0).toUpperCase() + genre.slice(1) + ' Movies';
+            if (genre === 'home') {
+                fetchSuggestions();
+            } else {
+                fetchGenreMovies(genre);
+            }
+        }
+        
+        function fetchSuggestions() {
+            fetch(`${baseUrl}/api/search/trending?page=1`)
+                .then(response => response.json())
+                .then(data => {
+                    displaySuggestions(data.results.items.slice(0, 25));
+                })
+                .catch(error => {
+                    fetch(`${baseUrl}/api/search/popular?page=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            displaySuggestions(data.results.items.slice(0, 25));
+                        })
+                        .catch(error => {
+                            fetch(`${baseUrl}/api/search/action?page=1`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    displaySuggestions(data.results.items.slice(0, 25));
+                                });
+                        });
+                });
+        }
+        
+        function fetchGenreMovies(genre) {
+            fetch(`${baseUrl}/api/search/${genre}?page=1`)
+                .then(response => response.json())
+                .then(data => {
+                    displaySuggestions(data.results.items.slice(0, 25));
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function displaySuggestions(items) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => showDetails(item.subjectId);
+                card.innerHTML = `
+                    <img src="${item.cover.url}" alt="${item.title}">
+                    <h3>${item.title}</h3>
+                    <p>${item.releaseDate} | ${item.genre}</p>
+                `;
+                suggestionsDiv.appendChild(card);
+            });
+        }
+        
+        function searchMovies() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+            currentQuery = query;
+            currentPage = 1;
+            document.getElementById('suggestions').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            fetchResults(query, 1);
+        }
+        
+        function fetchResults(query, page) {
+            fetch(`${baseUrl}/api/search/${encodeURIComponent(query)}?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (page === 1) {
+                        document.getElementById('results').innerHTML = '';
+                        document.getElementById('details').classList.add('hidden');
+                    }
+                    displayResults(data.results.items);
+                    hasMore = data.results.pager.hasMore;
+                    document.getElementById('load-more').classList.toggle('hidden', !hasMore);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function displayResults(items) {
+            const resultsDiv = document.getElementById('results');
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => showDetails(item.subjectId);
+                card.innerHTML = `
+                    <img src="${item.cover.url}" alt="${item.title}">
+                    <h3>${item.title}</h3>
+                    <p>${item.releaseDate} | ${item.genre}</p>
+                `;
+                resultsDiv.appendChild(card);
+            });
+        }
+        
+        function loadMore() {
+            currentPage++;
+            fetchResults(currentQuery, currentPage);
+        }
+        
+        function showDetails(id) {
+            fetch(`${baseUrl}/api/info/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    const subject = data.results.subject;
+                    const stars = data.results.stars;
+                    const resource = data.results.resource;
+                    
+                    let detailsHtml = `
+                        <img src="${subject.cover.url}" alt="${subject.title}">
+                        <h2>${subject.title}</h2>
+                        <p><strong>Description:</strong> ${subject.description}</p>
+                        <p><strong>Release Date:</strong> ${subject.releaseDate}</p>
+                        <p><strong>Genre:</strong> ${subject.genre}</p>
+                        <p><strong>IMDB Rating:</strong> ${subject.imdbRatingValue} (${subject.imdbRatingCount} votes)</p>
+                        <p><strong>Country:</strong> ${subject.countryName}</p>
+                        <p><strong>Duration:</strong> ${Math.floor(subject.duration / 60)} minutes</p>
+                        <div class="cast">
+                            <h3>Cast:</h3>
+                            ${stars.slice(0, 10).map(star => `<img src="${star.avatarUrl}" alt="${star.name}" title="${star.name} as ${star.character}">`).join('')}
+                        </div>
+                        <div class="trailer">
+                            <button onclick="showTrailer('${subject.title}')">Watch Trailer</button>
+                        </div>
+                        <div class="downloads">
+                            <h3>Stream & Download:</h3>
+                    `;
+                    
+                    if (subject.subjectType === 1) {
+                        fetch(`${baseUrl}/api/sources/${id}`)
+                            .then(response => response.json())
+                            .then(sources => {
+                                sources.results.forEach(source => {
+                                    detailsHtml += `
+                                        <a href="${source.download_url}" download>Download ${source.quality} (${(source.size / 1024 / 1024 / 1024).toFixed(2)} GB)</a>
+                                        <button onclick="streamMovie('${source.download_url}')">Stream ${source.quality}</button>
+                                    `;
+                                });
+                                detailsHtml += '</div>';
+                                document.getElementById('details').innerHTML = detailsHtml;
+                                document.getElementById('details').classList.remove('hidden');
+                            });
+                    } else {
+                        fetch(`${baseUrl}/api/sources/${id}?season=1&episode=1`)
+                            .then(response => response.json())
+                            .then(sources => {
+                                sources.results.forEach(source => {
+                                    detailsHtml += `
+                                        <a href="${source.download_url}" download>Download S1E1 ${source.quality} (${(source.size / 1024 / 1024 / 1024).toFixed(2)} GB)</a>
+                                        <button onclick="streamMovie('${source.download_url}')">Stream S1E1 ${source.quality}</button>
+                                    `;
+                                });
+                                detailsHtml += '</div>';
+                                document.getElementById('details').innerHTML = detailsHtml;
+                                document.getElementById('details').classList.remove('hidden');
+                            });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function showTrailer(title) {
+            const trailerDiv = document.querySelector('.trailer');
+            const searchQuery = encodeURIComponent(`${title} official trailer`);
+            const iframeHtml = `<iframe src="https://www.youtube.com/results?search_query=${searchQuery}" allowfullscreen></iframe>`;
+            trailerDiv.innerHTML += iframeHtml;
+        }
+        
+        function streamMovie(url) {
+            const videoHtml = `<video controls><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+            document.getElementById('details').insertAdjacentHTML('beforeend', videoHtml);
+        }
+    </script>
+</body>
+</html>
